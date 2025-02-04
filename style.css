@@ -1,91 +1,100 @@
 body {
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #323232;
-    color:aqua;
-    position: relative;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #323232;
+  color: aqua;
+  position: relative;
 }
 
 table {
-    border-collapse: separate;
-    border-spacing: 0;
-    margin-top: 20px;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 20px;
+  border: 1px solid white;
 }
 
 td {
-    width: 100px;
-    height: 100px;
-    text-align: center;
-    vertical-align: middle;
-    border: 5px solid white;
-    cursor: pointer;
+  width: 100px;
+  height: 100px;
+  text-align: center;
+  vertical-align: middle;
+  border: 3px solid white;
+  cursor: pointer;
 }
 
 td:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .winning-line {
-    position: absolute;
-    background-color: red;
-    height: 5px;
-    pointer-events: none;
-    z-index: 10;
-    transform-origin: left center;
+  position: absolute;
+  background-color: red;
+  height: 5px;
+  pointer-events: none;
+  z-index: 10;
+  transform-origin: left center;
 }
 
 #winner-text {
-    font-size: 36px;
-    margin-top: 20px;
-    color: aqua;
-    text-align: center;
+font-size: 24px; 
+  margin-top: 20px;
+  color: aqua;
+  text-align: center;
 }
 
 .winner-animation {
-    animation: winnerRotate 2.5s linear;
+  animation: winnerRotate 2.5s linear;
 }
 
 .winner-pulse {
-    animation: winnerPulse 1s infinite alternate;
-}
-
-@keyframes winnerRotate {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(1800deg); }
-}
-
-@keyframes winnerPulse {
-    from { transform: scale(1); }
-    to { transform: scale(1.1); }
+  animation: winnerPulse 1s infinite alternate;
 }
 
 #button-container {
-    text-align: center;
-    margin-top: 20px;
+  text-align: center;
+  margin-top: 20px;
 }
 
 #restart-button {
-    background-color: #4CAF50;
-    border: none;
-    color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 12px;
-    transition: all 0.3s ease;
+  background-color: #4caf50;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: all 0.3s ease;
 }
 
 #restart-button:hover {
-    background-color: #45a049;
-    transform: scale(1.05);
+  background-color: #45a049;
+  transform: scale(1.05);
 }
 
 #restart-button:active {
-    transform: scale(0.95);
+  transform: scale(0.95);
+}
+
+@keyframes winnerRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(1800deg);
+  }
+}
+
+@keyframes winnerPulse {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.1);
+  }
 }

@@ -4,10 +4,12 @@ let gameOver = false;
 
 function init() {
     render();
+    document.getElementById('restart-button').addEventListener('click', restartGame);
 }
 
 function render() {
-    document.getElementById('content').innerHTML = `
+    const content = document.getElementById('content');
+    content.innerHTML = `
         <table>${Array(3).fill().map((_, i) => 
             `<tr>${Array(3).fill().map((_, j) => {
                 const index = i * 3 + j;
@@ -16,24 +18,6 @@ function render() {
             }).join('')}</tr>`
         ).join('')}</table>
     `;
-}
-
-function handleClick(cell, index) {
-    if (fields[index] === null && !gameOver) {
-        fields[index] = currentPlayer;
-        cell.innerHTML = generateSVG(currentPlayer);
-        cell.onclick = null;
-        
-        const winningCombo = checkForWin();
-        if (winningCombo) {
-            gameOver = true;
-            showWinner();
-            drawWinningLine(winningCombo);
-            throwConfetti();
-        } else {
-            currentPlayer = currentPlayer === 'circle' ? 'cross' : 'circle';
-        }
-    }
 }
 
 function generateSVG(player) {
@@ -51,34 +35,67 @@ function checkForWin() {
 
 function showWinner() {
     const winnerText = document.getElementById('winner-text');
-    winnerText.innerHTML = `Spieler ${currentPlayer === 'circle' ? 'Circle' : 'X'}<br>hat gewonnen!`;
+    winnerText.innerHTML = `Glückwunsch! Spieler ${currentPlayer === 'circle' ? 'O' : 'X'}<br>hat gewonnen!`;
     winnerText.classList.add('winner-animation');
-    setTimeout(() => {
-        winnerText.classList.remove('winner-animation');
-        winnerText.classList.add('winner-pulse');
-    }, 2500);
+    document.getElementById('restart-button').style.display = 'block';
+}
+
+function showDraw() {
+    const winnerText = document.getElementById('winner-text');
+    winnerText.innerHTML = 'Unentschieden!';
+    winnerText.classList.add('winner-animation');
+    document.getElementById('restart-button').style.display = 'block';
+}
+
+function drawWinningLine(combo) {
+}
+
+function throwConfetti() {
+    confetti({particleCount: 100, spread: 70, origin: { y: 0.6 }});
+}
+
+function restartGame() {
+    fields = Array(9).fill(null);
+    currentPlayer = 'circle';
+    gameOver = false;
+    
+    const winnerText = document.getElementById('winner-text');
+    winnerText.innerHTML = '';
+    winnerText.classList.remove('winner-animation');
+    
+    document.getElementById('restart-button').style.display = 'none';
+    
+    const winningLine = document.querySelector('.winning-line');
+    if (winningLine) winningLine.remove();
+    
+    render();
 }
 
 function drawWinningLine(combo) {
     const content = document.getElementById('content');
     const contentRect = content.getBoundingClientRect();
-    const rects = combo.map(index => document.getElementsByTagName('td')[index].getBoundingClientRect());
+    const cells = combo.map(index => document.getElementsByTagName('td')[index]);
+    const rects = cells.map(cell => cell.getBoundingClientRect());
 
     const line = document.createElement('div');
     line.className = 'winning-line';
 
-    let [startX, startY, endX, endY] = [0, 0, 0, 0];
+    let startX, startY, endX, endY;
     const borderWidth = 5;
 
     if (combo[0] % 3 === combo[1] % 3) {
-        [startX, endX] = [rects[0].left + rects[0].width / 2 - contentRect.left, rects[0].left + rects[0].width / 2 - contentRect.left];
-        [startY, endY] = [borderWidth, contentRect.height - borderWidth];
+        startX = endX = rects[0].left + rects[0].width / 2 - contentRect.left;
+        startY = borderWidth;
+        endY = contentRect.height - borderWidth;
     } else if (Math.floor(combo[0] / 3) === Math.floor(combo[1] / 3)) {
-        [startX, endX] = [borderWidth, contentRect.width - borderWidth];
-        [startY, endY] = [rects[0].top + rects[0].height / 2 - contentRect.top, rects[0].top + rects[0].height / 2 - contentRect.top];
+        startX = borderWidth;
+        endX = contentRect.width - borderWidth;
+        startY = endY = rects[0].top + rects[0].height / 2 - contentRect.top;
     } else {
-        [startX, startY] = combo[0] === 0 ? [borderWidth, borderWidth] : [contentRect.width - borderWidth, borderWidth];
-        [endX, endY] = combo[0] === 0 ? [contentRect.width - borderWidth, contentRect.height - borderWidth] : [borderWidth, contentRect.height - borderWidth];
+        startX = combo[0] === 0 ? borderWidth : contentRect.width - borderWidth;
+        startY = borderWidth;
+        endX = combo[0] === 0 ? contentRect.width - borderWidth : borderWidth;
+        endY = contentRect.height - borderWidth;
     }
 
     const length = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
@@ -89,18 +106,35 @@ function drawWinningLine(combo) {
         top: `${startY}px`,
         left: `${startX}px`,
         transform: `rotate(${angle}deg)`,
-        transformOrigin: 'left center'
+        transformOrigin: 'left center',
+        position: 'absolute',
+        backgroundColor: 'red',
+        height: '5px'
     });
 
     content.style.position = 'relative';
     content.appendChild(line);
 }
 
-function throwConfetti() {
-    confetti({particleCount: 100, spread: 70, origin: { y: 0.6 }});
+function handleClick(cell, index) {
+    if (fields[index] === null && !gameOver) {
+        fields[index] = currentPlayer;
+        cell.innerHTML = generateSVG(currentPlayer);
+        cell.onclick = null;
+        
+        const winningCombo = checkForWin();
+        if (winningCombo) {
+            gameOver = true;
+            showWinner();
+            drawWinningLine(winningCombo);
+            throwConfetti();
+        } else if (fields.every(field => field !== null)) {
+            showDraw();
+        } else {
+            currentPlayer = currentPlayer === 'circle' ? 'cross' : 'circle';
+        }
+    }
 }
 
+
 init();
-
-
-
