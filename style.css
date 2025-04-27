@@ -1,18 +1,43 @@
+:root {
+  --primary-color: #323232;
+  --accent-color: #00b0ef;
+  --cross-color: rgb(155, 192, 0);
+  --winner-color: #ff3333;
+  --button-color: #4caf50;
+  --button-hover: #45a049;
+  --border-color: #ffffff;
+}
+
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Arial', sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #323232;
-  color: aqua;
+  background-color: var(--primary-color);
+  color: var(--accent-color);
   position: relative;
+  margin: 0;
+  padding: 20px;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+h1 {
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#game-container {
+  position: relative;
+  display: inline-block;
 }
 
 table {
   border-collapse: separate;
   border-spacing: 0;
   margin-top: 20px;
-  border: 1px solid white;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 td {
@@ -20,36 +45,40 @@ td {
   height: 100px;
   text-align: center;
   vertical-align: middle;
-  border: 3px solid white;
+  border: 3px solid var(--border-color);
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 td:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.winning-line {
-  position: absolute;
-  background-color: red;
-  height: 5px;
+#winning-line-svg {
   pointer-events: none;
-  z-index: 10;
-  transform-origin: left center;
+  z-index: 100;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 #winner-text {
   font-size: 24px;
   margin-top: 20px;
-  color: aqua;
+  color: var(--accent-color);
   text-align: center;
+  font-weight: bold;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 .winner-animation {
   animation: winnerRotate 2.5s linear;
-}
-
-.winner-pulse {
-  animation: winnerPulse 1s infinite alternate;
 }
 
 #button-container {
@@ -58,7 +87,7 @@ td:hover {
 }
 
 #restart-button {
-  background-color: #4caf50;
+  background-color: var(--button-color);
   border: none;
   color: white;
   padding: 15px 32px;
@@ -70,31 +99,42 @@ td:hover {
   cursor: pointer;
   border-radius: 12px;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 #restart-button:hover {
-  background-color: #45a049;
+  background-color: var(--button-hover);
   transform: scale(1.05);
 }
 
 #restart-button:active {
   transform: scale(0.95);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 @keyframes winnerRotate {
   0% {
-    transform: rotate(0deg);
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(900deg) scale(1.2);
   }
   100% {
-    transform: rotate(1800deg);
+    transform: rotate(1800deg) scale(1);
   }
 }
 
-@keyframes winnerPulse {
-  from {
-    transform: scale(1);
+@media (max-width: 500px) {
+  td {
+    width: 80px;
+    height: 80px;
   }
-  to {
-    transform: scale(1.1);
+  
+  h1 {
+    font-size: 24px;
+  }
+  
+  #winner-text {
+    font-size: 20px;
   }
 }
