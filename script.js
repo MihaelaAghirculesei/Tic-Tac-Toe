@@ -100,46 +100,43 @@ class TicTacToe {
     
     svgElement.innerHTML = '';
     
-    const tableRect = document.querySelector('table').getBoundingClientRect();
-    svgElement.setAttribute('width', tableRect.width);
-    svgElement.setAttribute('height', tableRect.height);
-    
-    let x1, y1, x2, y2;
-    
-    const getCellCenter = (index) => {
-      const row = Math.floor(index / 3);
-      const col = index % 3;
-      
-      const cellWidth = tableRect.width / 3;
-      const cellHeight = tableRect.height / 3;
-      
-      return {
-        x: col * cellWidth + cellWidth / 2,
-        y: row * cellHeight + cellHeight / 2
+ const container = document.getElementById('game-container');
+ const containerRect = container.getBoundingClientRect();
+
+ svgElement.setAttribute('width', containerRect.width);
+ svgElement.setAttribute('height', containerRect.height);
+
+ const cells = combo.map(index => 
+   document.querySelector(`td[data-index="${index}"]`)
+ );
+
+ const getCenter = (cell) => {
+   const cellRect = cell.getBoundingClientRect();
+   return {
+     x: cellRect.left - containerRect.left + cellRect.width / 2,
+     y: cellRect.top - containerRect.top + cellRect.height / 2
       };
     };
     
-    const startCell = getCellCenter(combo[0]);
-    const endCell = getCellCenter(combo[2]);
-    
+  const start = getCenter(cells[0]);
+  const end = getCenter(cells[2]);
+
     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    line.setAttribute('x1', startCell.x);
-    line.setAttribute('y1', startCell.y);
-    line.setAttribute('x2', endCell.x);
-    line.setAttribute('y2', endCell.y);
+    line.setAttribute('x1', start.x);
+    line.setAttribute('y1', start.y);
+    line.setAttribute('x2', end.x);
+    line.setAttribute('y2', end.y);
     line.setAttribute('stroke', 'red');
     line.setAttribute('stroke-width', '5');
     
     const animate = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
     animate.setAttribute('attributeName', 'stroke-dasharray');
     
-    const length = Math.sqrt(
-      Math.pow(endCell.x - startCell.x, 2) + 
-      Math.pow(endCell.y - startCell.y, 2)
-    );
+    const lineLength = Math.sqrt((end.x - start.x) ** 2 + (end.y - start.y) ** 2);
     
-    animate.setAttribute('from', `0 ${length}`);
-    animate.setAttribute('to', `${length} 0`);
+    animate.setAttribute('attributeName', 'stroke-dasharray');
+    animate.setAttribute('from', `0 ${lineLength}`);
+    animate.setAttribute('to', `${lineLength} 0`);
     animate.setAttribute('dur', '0.5s');
     animate.setAttribute('fill', 'freeze');
     
