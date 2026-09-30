@@ -93,7 +93,8 @@ export class BoardView {
     this.cells[0].focus({ preventScroll: true });
   }
 
-  render(state) {
+  /** `locked` blocks input without ending the game, e.g. while the computer is moving. */
+  render(state, { locked = false } = {}) {
     const gameOver = isGameOver(state);
 
     this.cells.forEach((cell, index) => {
@@ -107,10 +108,11 @@ export class BoardView {
       }
 
       cell.setAttribute('aria-label', `Feld ${index + 1}, ${player ?? 'leer'}`);
-      cell.setAttribute('aria-disabled', String(gameOver || player !== null));
+      cell.setAttribute('aria-disabled', String(gameOver || locked || player !== null));
     });
 
     this.boardElement.classList.toggle('is-over', gameOver);
+    this.boardElement.setAttribute('aria-busy', String(locked));
     this.boardElement.classList.toggle('is-draw', state.isDraw);
     this.renderWinningLine(state.winningLine);
   }

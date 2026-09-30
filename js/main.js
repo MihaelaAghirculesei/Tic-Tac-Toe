@@ -1,5 +1,15 @@
-import { createGame, isGameOver, makeMove } from './game.js';
+import { findBestMove } from './ai.js';
+import { PLAYERS, createGame, isGameOver, makeMove } from './game.js';
+import { EMPTY_SCORE, recordResult, sanitizeScore } from './score.js';
+import { loadJSON, saveJSON } from './storage.js';
 import { BoardView } from './view.js';
+
+const SETTINGS_STORAGE_KEY = 'tic-tac-toe:settings';
+
+const MODES = Object.freeze({ TWO_PLAYERS: 'two-players', COMPUTER: 'computer' });
+const COMPUTER_PLAYER = PLAYERS.X;
+// A short pause makes the computer's reply readable instead of instant.
+const COMPUTER_DELAY_MS = 450;
 
 function throwConfetti() {
   // The confetti script comes from a CDN; the game must keep working without it.
@@ -12,16 +22,44 @@ function throwConfetti() {
   });
 }
 
+// Each mode keeps its own score: computer games must not count as two-player results.
+const scoreStorageKey = (mode) => `tic-tac-toe:score:${mode}`;
+
+function sanitizeSettings(value) {
+  const mode = Object.values(MODES).includes(value?.mode) ? value.mode : MODES.TWO_PLAYERS;
+  const startingPlayer = Object.values(PLAYERS).includes(value?.startingPlayer)
+    ? value.startingPlayer
+    : PLAYERS.O;
+  return { mode, startingPlayer };
+}
+
 class TicTacToeApp {
   constructor() {
     this.statusElement = document.getElementById('status');
     this.restartButton = document.getElementById('restart-button');
+    this.settingsForm = document.getElementById('settings');
+    this.settingsNote = document.getElementById('settings-note');
+    this.pendingSettings = null;
+    this.scoreElements = {
+      O: document.getElementById('score-o'),
+      X: document.getElementById('score-x'),
+      draw: document.getElementById('score-draw'),
+    };
+    this.scoreLabels = {
+      O: document.getElementById('score-label-o'),
+      X: document.getElementById('score-label-x'),
+    };
+    this.settings = sanitizeSettings(loadJSON(SETTINGS_STORAGE_KEY, null));
+    this.score = this.loadScore();
+    this.computerTimer = null;
     this.view = new BoardView(
       document.getElementById('board'),
       document.getElementById('winning-line'),
     );
 
-    this.view.onCellSelect((index) => this.play(index));
+    this.view.onCellSelect((index) => {
+      if (!this.isComputerTurn()) this.play(index);
+    });
     this.view.enableArrowNavigation();
     this.restartButton.addEventListener('click', (event) => {
       this.restart();
@@ -29,13 +67,69 @@ class TicTacToeApp {
       // detail === 0 means Enter/Space; mouse and touch users keep their scroll position.
       if (event.detail === 0) this.view.focusFirstCell();
     });
+    document
+      .getElementById('reset-score-button')
+      .addEventListener('click', () => this.updateScore(EMPTY_SCORE));
+    this.settingsForm.addEventListener('change', () => this.changeSettings());
+    this.settingsForm.addEventListener('submit', (event) => event.preventDefault());
+    window.addEventListener('storage', (event) => {
+      if (event.key !== scoreStorageKey(this.settings.mode)) return;
+      this.score = this.loadScore(this.score);
+      this.renderScore();
+    });
 
+    this.settingsForm.elements.mode.value = this.settings.mode;
+    this.settingsForm.elements.startingPlayer.value = this.settings.startingPlayer;
+    this.renderScore();
     this.restart();
   }
 
+  isComputerMode() {
+    return this.settings.mode === MODES.COMPUTER;
+  }
+
+  isComputerTurn() {
+    return (
+      this.isComputerMode() &&
+      !isGameOver(this.state) &&
+      this.state.currentPlayer === COMPUTER_PLAYER
+    );
+  }
+
+  isGameInProgress() {
+    return !isGameOver(this.state) && this.state.board.some((cell) => cell !== null);
+  }
+
+  changeSettings() {
+    const { mode, startingPlayer } = this.settingsForm.elements;
+    const settings = sanitizeSettings({ mode: mode.value, startingPlayer: startingPlayer.value });
+    saveJSON(SETTINGS_STORAGE_KEY, settings);
+
+    // Switching mid-game would silently discard the game (and let a player dodge a loss),
+    // so a game in progress is finished with the settings it started with.
+    if (this.isGameInProgress()) {
+      this.pendingSettings = settings;
+      this.settingsNote.hidden = false;
+      return;
+    }
+    this.applySettings(settings);
+    this.restart();
+  }
+
+  applySettings(settings) {
+    this.settings = settings;
+    this.pendingSettings = null;
+    this.settingsNote.hidden = true;
+    this.score = this.loadScore();
+    this.renderScore();
+  }
+
   restart() {
-    this.state = createGame();
+    clearTimeout(this.computerTimer);
+    if (this.pendingSettings) this.applySettings(this.pendingSettings);
+    this.state = createGame(this.settings.startingPlayer);
     this.render();
+    this.scheduleComputerMove();
   }
 
   play(index) {
@@ -44,28 +138,69 @@ class TicTacToeApp {
 
     this.state = next;
     this.render();
-    if (this.state.winner) throwConfetti();
+
+    if (isGameOver(this.state)) {
+      // Re-read first: another open tab may have recorded games in the meantime.
+      this.updateScore(recordResult(this.loadScore(this.score), this.state));
+      if (this.state.winner && !this.isComputerWin()) throwConfetti();
+    } else {
+      this.scheduleComputerMove();
+    }
+  }
+
+  scheduleComputerMove() {
+    if (!this.isComputerTurn()) return;
+    this.computerTimer = setTimeout(() => {
+      this.play(findBestMove(this.state.board, COMPUTER_PLAYER));
+    }, COMPUTER_DELAY_MS);
+  }
+
+  isComputerWin() {
+    return this.isComputerMode() && this.state.winner === COMPUTER_PLAYER;
+  }
+
+  /** Falls back to the in-memory score, so unavailable storage never wipes it. */
+  loadScore(fallback = EMPTY_SCORE) {
+    return sanitizeScore(loadJSON(scoreStorageKey(this.settings.mode), fallback));
+  }
+
+  updateScore(score) {
+    this.score = score;
+    saveJSON(scoreStorageKey(this.settings.mode), score);
+    this.renderScore();
+  }
+
+  renderScore() {
+    for (const [key, element] of Object.entries(this.scoreElements)) {
+      element.textContent = String(this.score[key]);
+    }
+    this.scoreLabels.O.textContent = this.isComputerMode() ? 'Du (O)' : 'Spieler O';
+    this.scoreLabels.X.textContent = this.isComputerMode() ? 'Computer (X)' : 'Spieler X';
   }
 
   render() {
     const { winner, isDraw, currentPlayer } = this.state;
     const gameOver = isGameOver(this.state);
 
-    this.view.render(this.state);
+    this.view.render(this.state, { locked: this.isComputerTurn() });
     this.statusElement.textContent = this.statusText();
     // Colour the status by the player it talks about; a draw keeps the neutral colour.
     const statusPlayer = winner ?? (isDraw ? null : currentPlayer);
     if (statusPlayer) this.statusElement.dataset.player = statusPlayer;
     else delete this.statusElement.dataset.player;
-    this.statusElement.classList.toggle('is-celebrating', winner !== null);
+    this.statusElement.classList.toggle('is-celebrating', winner !== null && !this.isComputerWin());
     this.statusElement.classList.toggle('is-draw', isDraw);
     this.restartButton.hidden = !gameOver;
   }
 
   statusText() {
     const { winner, isDraw, currentPlayer } = this.state;
+    if (this.isComputerWin()) return 'Der Computer hat gewonnen.\nVersuch es noch einmal!';
+    if (winner && this.isComputerMode()) return 'Glückwunsch!\nDu hast gewonnen!';
     if (winner) return `Glückwunsch! Spieler ${winner}\nhat gewonnen!`;
     if (isDraw) return 'Unentschieden!\nNiemand hat gewonnen.';
+    if (this.isComputerTurn()) return 'Der Computer denkt nach …';
+    if (this.isComputerMode()) return 'Du bist dran';
     return `Spieler ${currentPlayer} ist dran`;
   }
 }

@@ -18,6 +18,43 @@
     <h1>Tic Tac Toe</h1>
 
     <main class="game">
+      <form id="settings" class="settings" aria-label="Spieleinstellungen">
+        <fieldset class="segmented">
+          <legend>Gegner</legend>
+          <label><input type="radio" name="mode" value="two-players" checked /> Zwei Spieler</label>
+          <label><input type="radio" name="mode" value="computer" /> Computer</label>
+        </fieldset>
+        <fieldset class="segmented">
+          <legend>Beginnt</legend>
+          <label><input type="radio" name="startingPlayer" value="O" checked /> O</label>
+          <label><input type="radio" name="startingPlayer" value="X" /> X</label>
+        </fieldset>
+        <p id="settings-note" class="settings-note" role="status" hidden>
+          Änderungen gelten ab dem nächsten Spiel.
+        </p>
+      </form>
+
+      <section class="scoreboard" aria-labelledby="scoreboard-title">
+        <h2 id="scoreboard-title" class="visually-hidden">Punktestand</h2>
+        <dl class="score-list">
+          <div class="score score--o">
+            <dt id="score-label-o">Spieler O</dt>
+            <dd id="score-o">0</dd>
+          </div>
+          <div class="score">
+            <dt>Unentschieden</dt>
+            <dd id="score-draw">0</dd>
+          </div>
+          <div class="score score--x">
+            <dt id="score-label-x">Spieler X</dt>
+            <dd id="score-x">0</dd>
+          </div>
+        </dl>
+        <button id="reset-score-button" class="text-button" type="button">
+          Punktestand zurücksetzen
+        </button>
+      </section>
+
       <div class="board-wrapper">
         <div id="board" class="board" role="group" aria-label="Spielfeld"></div>
         <svg id="winning-line" class="winning-line" viewBox="0 0 300 300" aria-hidden="true"></svg>
