@@ -27,6 +27,10 @@ describe('findBestMove', () => {
     assert.equal(findBestMove([O, X, O, O, X, X, X, O, O], X), null);
   });
 
+  it('returns null when the game is already won', () => {
+    assert.equal(findBestMove([X, X, X, O, O, _, _, _, _], O), null);
+  });
+
   it('never loses, whatever the opponent plays', () => {
     // Explore every possible opponent line, with the computer on either side.
     const explore = (state, computer) => {

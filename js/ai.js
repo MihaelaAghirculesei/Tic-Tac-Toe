@@ -35,8 +35,10 @@ function negamax(board, player, depth, alpha, beta) {
   return best;
 }
 
-/** Returns the optimal cell index for `player`, or null if the board is full. */
+/** Returns the optimal cell index for `player`, or null if the game is already over. */
 export function findBestMove(board, player) {
+  if (findWinningLine(board)) return null;
+
   let bestMove = null;
   let bestScore = -Infinity;
 
