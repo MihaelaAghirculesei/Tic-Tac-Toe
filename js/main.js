@@ -70,6 +70,11 @@ class TicTacToeApp {
       .addEventListener('click', () => this.updateScore(EMPTY_SCORE));
     this.settingsForm.addEventListener('change', () => this.changeSettings());
     this.settingsForm.addEventListener('submit', (event) => event.preventDefault());
+    window.addEventListener('storage', (event) => {
+      if (event.key !== scoreStorageKey(this.settings.mode)) return;
+      this.score = this.loadScore(this.score);
+      this.renderScore();
+    });
 
     this.settingsForm.elements.mode.value = this.settings.mode;
     this.settingsForm.elements.startingPlayer.value = this.settings.startingPlayer;
@@ -113,7 +118,8 @@ class TicTacToeApp {
     this.render();
 
     if (isGameOver(this.state)) {
-      this.updateScore(recordResult(this.score, this.state));
+      // Re-read first: another open tab may have recorded games in the meantime.
+      this.updateScore(recordResult(this.loadScore(this.score), this.state));
       if (this.state.winner && !this.isComputerWin()) throwConfetti();
     } else {
       this.scheduleComputerMove();
@@ -131,8 +137,9 @@ class TicTacToeApp {
     return this.isComputerMode() && this.state.winner === COMPUTER_PLAYER;
   }
 
-  loadScore() {
-    return sanitizeScore(loadJSON(scoreStorageKey(this.settings.mode), EMPTY_SCORE));
+  /** Falls back to the in-memory score, so unavailable storage never wipes it. */
+  loadScore(fallback = EMPTY_SCORE) {
+    return sanitizeScore(loadJSON(scoreStorageKey(this.settings.mode), fallback));
   }
 
   updateScore(score) {
