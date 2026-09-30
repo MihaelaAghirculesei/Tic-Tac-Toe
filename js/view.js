@@ -45,6 +45,8 @@ function createCell(index) {
   cell.type = 'button';
   cell.className = 'cell';
   cell.dataset.index = String(index);
+  // Roving tabindex: the board is a single Tab stop, arrow keys move inside it.
+  cell.tabIndex = index === 0 ? 0 : -1;
   return cell;
 }
 
@@ -54,6 +56,15 @@ export class BoardView {
     this.lineElement = lineElement;
     this.cells = Array.from({ length: BOARD_SIZE }, (_, index) => createCell(index));
     this.boardElement.replaceChildren(...this.cells);
+
+    this.boardElement.addEventListener('focusin', (event) => {
+      const cell = event.target.closest('.cell');
+      if (cell) this.setTabStop(cell);
+    });
+  }
+
+  setTabStop(activeCell) {
+    for (const cell of this.cells) cell.tabIndex = cell === activeCell ? 0 : -1;
   }
 
   onCellSelect(handler) {
@@ -63,7 +74,7 @@ export class BoardView {
     });
   }
 
-  /** Arrow keys move the focus across the grid (Tab still works as usual). */
+  /** Arrow keys move the focus across the grid. */
   enableArrowNavigation() {
     this.boardElement.addEventListener('keydown', (event) => {
       // Leave modified arrows (e.g. Alt+Left = back) to the browser and assistive tech.
@@ -79,7 +90,7 @@ export class BoardView {
   }
 
   focusFirstCell() {
-    this.cells[0].focus();
+    this.cells[0].focus({ preventScroll: true });
   }
 
   render(state) {
