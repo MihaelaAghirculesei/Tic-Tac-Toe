@@ -35,25 +35,35 @@ function negamax(board, player, depth, alpha, beta) {
   return best;
 }
 
-/** Returns the optimal cell index for `player`, or null if the game is already over. */
-export function findBestMove(board, player) {
+/**
+ * Returns an optimal cell index for `player`, or null if the game is already over.
+ * Equally good moves are picked at random so the computer does not play a fixed script;
+ * `random` can be injected to make tests deterministic.
+ */
+export function findBestMove(board, player, random = Math.random) {
   if (findWinningLine(board)) return null;
 
-  let bestMove = null;
+  let bestMoves = [];
   let bestScore = -Infinity;
 
   for (const index of getAvailableMoves(board)) {
+    // Scores are integers, so a window starting just below bestScore still reports
+    // exact values for moves that tie with the best one found so far.
     const score = -negamax(
       place(board, index, player),
       otherPlayer(player),
       1,
       -Infinity,
-      -bestScore,
+      -(bestScore - 1),
     );
     if (score > bestScore) {
       bestScore = score;
-      bestMove = index;
+      bestMoves = [index];
+    } else if (score === bestScore) {
+      bestMoves.push(index);
     }
   }
-  return bestMove;
+
+  if (bestMoves.length === 0) return null;
+  return bestMoves[Math.floor(random() * bestMoves.length)];
 }

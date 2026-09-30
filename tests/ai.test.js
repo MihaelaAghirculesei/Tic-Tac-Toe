@@ -31,6 +31,29 @@ describe('findBestMove', () => {
     assert.equal(findBestMove([X, X, X, O, O, _, _, _, _], O), null);
   });
 
+  it('chooses randomly among equally good moves', () => {
+    // On an empty board every opening leads to a draw, so all nine cells tie.
+    const empty = Array(9).fill(null);
+    assert.equal(
+      findBestMove(empty, X, () => 0),
+      0,
+    );
+    assert.equal(
+      findBestMove(empty, X, () => 0.999),
+      8,
+    );
+  });
+
+  it('never picks a worse move to add variety', () => {
+    // Only cell 2 wins immediately, whatever the random value is.
+    for (const r of [0, 0.5, 0.999]) {
+      assert.equal(
+        findBestMove([X, X, _, O, O, _, _, _, _], X, () => r),
+        2,
+      );
+    }
+  });
+
   it('never loses, whatever the opponent plays', () => {
     // Explore every possible opponent line, with the computer on either side.
     const explore = (state, computer) => {
