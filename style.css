@@ -160,7 +160,8 @@ h1 {
 }
 
 .board.is-draw .mark {
-  opacity: 0.4;
+  /* 0.7 keeps both marks above 3:1 contrast (WCAG 1.4.11) while still reading as dimmed. */
+  opacity: 0.7;
   transition: opacity 0.6s ease;
 }
 
