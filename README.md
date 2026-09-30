@@ -1,9 +1,11 @@
 # Tic Tac Toe
 
-> A sleek, animated Tic Tac Toe built with pure HTML, CSS & JavaScript — no framework, no build step.
+> A sleek, animated Tic Tac Toe built with vanilla HTML, CSS and JavaScript — no framework, no build step.
+
+**[▶ Play the live demo](https://mihaelaaghirculesei.github.io/Tic-Tac-Toe/)**
 
 <p align="center">
-  <img src="tic_tac_toe.png" alt="Tic Tac Toe Screenshot" width="350">
+  <img src="tic_tac_toe.png" alt="Tic Tac Toe board with a diagonal win for player O" width="360">
 </p>
 
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
@@ -12,40 +14,62 @@
 
 ## Features
 
-- **SVG-drawn symbols** — X and O animate onto the board as if hand-drawn
-- **Dynamic winning line** — a red line sweeps across the winning combination
-- **Confetti celebration** — canvas-confetti burst on victory
-- **Fully responsive** — plays great on desktop and mobile
-- **Zero build step** — plain ES modules, served as they are
+- **Two players or vs. computer** — the computer uses minimax with alpha-beta pruning and never loses
+- **Choose who starts** — O or X; in computer mode X is the computer
+- **Persistent scoreboard** — wins and draws are kept in `localStorage`
+- **Animated SVG marks** — X and O are drawn onto the board stroke by stroke
+- **Responsive winning line** — drawn in a scalable SVG overlay, so it stays aligned on resize and rotation
+- **Light and dark theme** — follows the system preference, can be toggled and is remembered
+- **Accessible** — real buttons, arrow-key navigation, screen reader announcements and `prefers-reduced-motion` support
+- **Confetti** on victory via [canvas-confetti](https://github.com/catdad/canvas-confetti) (optional: the game works without it)
 
 ## Tech Stack
 
-| Layer   | Technology                                           |
-| ------- | ---------------------------------------------------- |
-| Markup  | Semantic HTML5                                       |
-| Styling | CSS3 Custom Properties, Keyframe Animations, Flexbox |
-| Logic   | Vanilla ES modules, pure game logic with unit tests  |
-| Effects | canvas-confetti (CDN)                                |
+| Layer   | Technology                                               |
+| ------- | -------------------------------------------------------- |
+| Markup  | HTML5 (buttons, form controls, ARIA live region)         |
+| Styling | CSS custom properties, CSS Grid, keyframe animations     |
+| Logic   | Vanilla JavaScript ES modules, pure game/AI logic        |
+| Tooling | Node's built-in test runner, ESLint, Prettier (dev only) |
+| Effects | canvas-confetti 1.9.4 from jsDelivr, pinned with SRI     |
 
-## Quick Start
+## Getting Started
 
 The game uses ES modules, which browsers do not load from `file://`. Serve the folder with any static server:
 
 ```bash
 git clone https://github.com/MihaelaAghirculesei/Tic-Tac-Toe.git
 cd Tic-Tac-Toe
-npx serve .          # or: python -m http.server
+npm start            # runs "npx serve ." — or: python -m http.server
 ```
+
+Then open the printed URL (e.g. http://localhost:3000).
 
 ## Development
 
 ```bash
-npm install
-npm test
+npm install          # dev tools only (ESLint, Prettier)
+npm test             # unit tests for game logic, score and computer player
 npm run lint
-npm run format:check
+npm run format
+```
+
+## Project Structure
+
+```
+index.html          markup and inline theme bootstrap
+style.css           themes, layout and animations
+js/
+  game.js           pure game rules (no DOM) — board, moves, win/draw detection
+  ai.js             unbeatable computer player (negamax + alpha-beta)
+  score.js          scoreboard logic
+  storage.js        safe localStorage helpers
+  view.js           board rendering, winning line, keyboard navigation
+  theme.js          light/dark toggle
+  main.js           app controller wiring everything together
+tests/              node:test unit tests
 ```
 
 ## License
 
-MIT
+[MIT](LICENSE)
