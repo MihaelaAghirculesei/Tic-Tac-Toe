@@ -44,6 +44,70 @@ h1 {
   align-items: center;
 }
 
+/* Settings */
+
+.settings {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 20px;
+  margin-bottom: 16px;
+}
+
+.segmented {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.segmented legend {
+  float: left;
+  margin-right: 8px;
+  padding: 0;
+  font-size: 14px;
+}
+
+.segmented label {
+  position: relative;
+  padding: 6px 12px;
+  border: 2px solid var(--text-color);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.segmented label + label {
+  border-left-width: 0;
+}
+
+.segmented label:first-of-type {
+  border-radius: 8px 0 0 8px;
+}
+
+.segmented label:last-of-type {
+  border-radius: 0 8px 8px 0;
+}
+
+.segmented label:has(:checked) {
+  background-color: var(--text-color);
+  color: var(--background-color);
+}
+
+.segmented label:has(:focus-visible) {
+  outline: 3px solid var(--focus-color);
+  outline-offset: 2px;
+}
+
+/* The native radio stays in place (keyboard + screen readers), only visually hidden. */
+.segmented input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
 /* Scoreboard */
 
 .scoreboard {
