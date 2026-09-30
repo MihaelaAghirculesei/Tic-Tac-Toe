@@ -1,29 +1,33 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="assets/img/logo.png" />
-  <title>Tic Tac Toe</title>
-  <link rel="stylesheet" href="style.css" />
-  <script
-    src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.js"
-    integrity="sha384-bopE5cbMjKUprmGnIRk2UdvCnHImrRLCtNW2uR6oDYqO+o3XWJeuIrWWxDzeDgNW"
-    crossorigin="anonymous"
-    defer
-  ></script>
-</head>
-<body>
-  <h1>Tic Tac Toe</h1>
-  
-  <div id="content"></div>
-  
-  <div id="winner-text"></div>
-  
-  <div id="button-container">
-    <button id="restart-button" style="display: none">Spiel neu starten</button>
-  </div>
-  
-  <script src="script.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tic Tac Toe</title>
+    <link rel="icon" type="image/png" href="assets/img/logo.png" />
+    <link rel="stylesheet" href="style.css" />
+    <script
+      src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.js"
+      integrity="sha384-bopE5cbMjKUprmGnIRk2UdvCnHImrRLCtNW2uR6oDYqO+o3XWJeuIrWWxDzeDgNW"
+      crossorigin="anonymous"
+      defer
+    ></script>
+    <script type="module" src="js/main.js"></script>
+  </head>
+  <body>
+    <h1>Tic Tac Toe</h1>
+
+    <main class="game">
+      <div class="board-wrapper">
+        <div id="board" class="board" role="group" aria-label="Spielfeld"></div>
+        <svg id="winning-line" class="winning-line" viewBox="0 0 300 300" aria-hidden="true"></svg>
+      </div>
+
+      <p id="status" class="status"></p>
+
+      <button id="restart-button" class="restart-button" type="button" hidden>
+        Spiel neu starten
+      </button>
+    </main>
+  </body>
 </html>
