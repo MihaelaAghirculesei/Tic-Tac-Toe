@@ -4,7 +4,6 @@ import { EMPTY_SCORE, recordResult, sanitizeScore } from './score.js';
 import { loadJSON, saveJSON } from './storage.js';
 import { BoardView } from './view.js';
 
-const SCORE_STORAGE_KEY = 'tic-tac-toe:score';
 const SETTINGS_STORAGE_KEY = 'tic-tac-toe:settings';
 
 const MODES = Object.freeze({ TWO_PLAYERS: 'two-players', COMPUTER: 'computer' });
@@ -22,6 +21,9 @@ function throwConfetti() {
     disableForReducedMotion: true,
   });
 }
+
+// Each mode keeps its own score: computer games must not count as two-player results.
+const scoreStorageKey = (mode) => `tic-tac-toe:score:${mode}`;
 
 function sanitizeSettings(value) {
   const mode = Object.values(MODES).includes(value?.mode) ? value.mode : MODES.TWO_PLAYERS;
@@ -45,8 +47,8 @@ class TicTacToeApp {
       O: document.getElementById('score-label-o'),
       X: document.getElementById('score-label-x'),
     };
-    this.score = sanitizeScore(loadJSON(SCORE_STORAGE_KEY, EMPTY_SCORE));
     this.settings = sanitizeSettings(loadJSON(SETTINGS_STORAGE_KEY, null));
+    this.score = this.loadScore();
     this.computerTimer = null;
     this.view = new BoardView(
       document.getElementById('board'),
@@ -91,6 +93,7 @@ class TicTacToeApp {
     const { mode, startingPlayer } = this.settingsForm.elements;
     this.settings = sanitizeSettings({ mode: mode.value, startingPlayer: startingPlayer.value });
     saveJSON(SETTINGS_STORAGE_KEY, this.settings);
+    this.score = this.loadScore();
     this.renderScore();
     this.restart();
   }
@@ -128,9 +131,13 @@ class TicTacToeApp {
     return this.isComputerMode() && this.state.winner === COMPUTER_PLAYER;
   }
 
+  loadScore() {
+    return sanitizeScore(loadJSON(scoreStorageKey(this.settings.mode), EMPTY_SCORE));
+  }
+
   updateScore(score) {
     this.score = score;
-    saveJSON(SCORE_STORAGE_KEY, score);
+    saveJSON(scoreStorageKey(this.settings.mode), score);
     this.renderScore();
   }
 
