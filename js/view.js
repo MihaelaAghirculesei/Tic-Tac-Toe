@@ -22,11 +22,31 @@ function cellCenter(index) {
   };
 }
 
+const ARROW_STEPS = {
+  ArrowLeft: { row: 0, col: -1 },
+  ArrowRight: { row: 0, col: 1 },
+  ArrowUp: { row: -1, col: 0 },
+  ArrowDown: { row: 1, col: 0 },
+};
+
+/** Index of the cell an arrow key leads to; stays put at the board edge. Null for other keys. */
+export function neighbourIndex(index, key) {
+  const step = ARROW_STEPS[key];
+  if (!step) return null;
+
+  const clamp = (value) => Math.min(Math.max(value, 0), GRID_SIZE - 1);
+  const row = clamp(Math.floor(index / GRID_SIZE) + step.row);
+  const col = clamp((index % GRID_SIZE) + step.col);
+  return row * GRID_SIZE + col;
+}
+
 function createCell(index) {
   const cell = document.createElement('button');
   cell.type = 'button';
   cell.className = 'cell';
   cell.dataset.index = String(index);
+  // Roving tabindex: the board is a single Tab stop, arrow keys move inside it.
+  cell.tabIndex = index === 0 ? 0 : -1;
   return cell;
 }
 
@@ -36,6 +56,15 @@ export class BoardView {
     this.lineElement = lineElement;
     this.cells = Array.from({ length: BOARD_SIZE }, (_, index) => createCell(index));
     this.boardElement.replaceChildren(...this.cells);
+
+    this.boardElement.addEventListener('focusin', (event) => {
+      const cell = event.target.closest('.cell');
+      if (cell) this.setTabStop(cell);
+    });
+  }
+
+  setTabStop(activeCell) {
+    for (const cell of this.cells) cell.tabIndex = cell === activeCell ? 0 : -1;
   }
 
   onCellSelect(handler) {
@@ -43,6 +72,25 @@ export class BoardView {
       const cell = event.target.closest('.cell');
       if (cell) handler(Number(cell.dataset.index));
     });
+  }
+
+  /** Arrow keys move the focus across the grid. */
+  enableArrowNavigation() {
+    this.boardElement.addEventListener('keydown', (event) => {
+      // Leave modified arrows (e.g. Alt+Left = back) to the browser and assistive tech.
+      if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+
+      const cell = event.target.closest('.cell');
+      const target = cell ? neighbourIndex(Number(cell.dataset.index), event.key) : null;
+      if (target === null) return;
+
+      event.preventDefault();
+      this.cells[target].focus();
+    });
+  }
+
+  focusFirstCell() {
+    this.cells[0].focus({ preventScroll: true });
   }
 
   render(state) {
@@ -63,6 +111,7 @@ export class BoardView {
     });
 
     this.boardElement.classList.toggle('is-over', gameOver);
+    this.boardElement.classList.toggle('is-draw', state.isDraw);
     this.renderWinningLine(state.winningLine);
   }
 
