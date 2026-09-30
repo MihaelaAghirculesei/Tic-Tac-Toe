@@ -85,6 +85,7 @@ export class BoardView {
     });
 
     this.boardElement.classList.toggle('is-over', gameOver);
+    this.boardElement.classList.toggle('is-draw', state.isDraw);
     this.renderWinningLine(state.winningLine);
   }
 

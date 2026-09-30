@@ -47,18 +47,22 @@ class TicTacToeApp {
   }
 
   render() {
+    const { winner, isDraw, currentPlayer } = this.state;
     const gameOver = isGameOver(this.state);
+
     this.view.render(this.state);
     this.statusElement.textContent = this.statusText();
-    this.statusElement.classList.toggle('is-celebrating', gameOver);
+    this.statusElement.dataset.player = gameOver ? '' : currentPlayer;
+    this.statusElement.classList.toggle('is-celebrating', winner !== null);
+    this.statusElement.classList.toggle('is-draw', isDraw);
     this.restartButton.hidden = !gameOver;
   }
 
   statusText() {
-    const { winner, isDraw } = this.state;
+    const { winner, isDraw, currentPlayer } = this.state;
     if (winner) return `Glückwunsch! Spieler ${winner}\nhat gewonnen!`;
-    if (isDraw) return 'Unentschieden!';
-    return '';
+    if (isDraw) return 'Unentschieden!\nNiemand hat gewonnen.';
+    return `Spieler ${currentPlayer} ist dran`;
   }
 }
 
