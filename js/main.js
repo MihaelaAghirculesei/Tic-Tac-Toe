@@ -1,5 +1,9 @@
 import { createGame, isGameOver, makeMove } from './game.js';
+import { EMPTY_SCORE, recordResult, sanitizeScore } from './score.js';
+import { loadJSON, saveJSON } from './storage.js';
 import { BoardView } from './view.js';
+
+const SCORE_STORAGE_KEY = 'tic-tac-toe:score';
 
 function throwConfetti() {
   // The confetti script comes from a CDN; the game must keep working without it.
@@ -16,6 +20,12 @@ class TicTacToeApp {
   constructor() {
     this.statusElement = document.getElementById('status');
     this.restartButton = document.getElementById('restart-button');
+    this.scoreElements = {
+      O: document.getElementById('score-o'),
+      X: document.getElementById('score-x'),
+      draw: document.getElementById('score-draw'),
+    };
+    this.score = sanitizeScore(loadJSON(SCORE_STORAGE_KEY, EMPTY_SCORE));
     this.view = new BoardView(
       document.getElementById('board'),
       document.getElementById('winning-line'),
@@ -29,7 +39,11 @@ class TicTacToeApp {
       // detail === 0 means Enter/Space; mouse and touch users keep their scroll position.
       if (event.detail === 0) this.view.focusFirstCell();
     });
+    document
+      .getElementById('reset-score-button')
+      .addEventListener('click', () => this.updateScore(EMPTY_SCORE));
 
+    this.renderScore();
     this.restart();
   }
 
@@ -44,7 +58,20 @@ class TicTacToeApp {
 
     this.state = next;
     this.render();
+    if (isGameOver(this.state)) this.updateScore(recordResult(this.score, this.state));
     if (this.state.winner) throwConfetti();
+  }
+
+  updateScore(score) {
+    this.score = score;
+    saveJSON(SCORE_STORAGE_KEY, score);
+    this.renderScore();
+  }
+
+  renderScore() {
+    for (const [key, element] of Object.entries(this.scoreElements)) {
+      element.textContent = String(this.score[key]);
+    }
   }
 
   render() {
