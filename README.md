@@ -1,6 +1,6 @@
 # Tic Tac Toe
 
-> A sleek, animated Tic Tac Toe built with pure HTML, CSS & JavaScript — no frameworks, no dependencies.
+> A sleek, animated Tic Tac Toe built with pure HTML, CSS & JavaScript — no framework, no build step.
 
 <p align="center">
   <img src="tic_tac_toe.png" alt="Tic Tac Toe Screenshot" width="350">
@@ -16,7 +16,7 @@
 - **Dynamic winning line** — a red line sweeps across the winning combination
 - **Confetti celebration** — canvas-confetti burst on victory
 - **Fully responsive** — plays great on desktop and mobile
-- **Zero build step** — just open `index.html` and play
+- **Zero build step** — plain ES modules, served as they are
 
 ## Tech Stack
 
@@ -24,15 +24,26 @@
 | ------- | ---------------------------------------------------- |
 | Markup  | Semantic HTML5                                       |
 | Styling | CSS3 Custom Properties, Keyframe Animations, Flexbox |
-| Logic   | Vanilla ES6+ (OOP, SVG DOM API)                      |
+| Logic   | Vanilla ES modules, pure game logic with unit tests  |
 | Effects | canvas-confetti (CDN)                                |
 
 ## Quick Start
 
+The game uses ES modules, which browsers do not load from `file://`. Serve the folder with any static server:
+
 ```bash
-# clone & play
-git clone <repo-url>
-open index.html
+git clone https://github.com/MihaelaAghirculesei/Tic-Tac-Toe.git
+cd Tic-Tac-Toe
+npx serve .          # or: python -m http.server
+```
+
+## Development
+
+```bash
+npm install
+npm test
+npm run lint
+npm run format:check
 ```
 
 ## License
