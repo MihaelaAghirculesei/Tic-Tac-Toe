@@ -75,13 +75,15 @@ class TicTacToeApp {
     this.restart();
   }
 
-  get isComputerMode() {
+  isComputerMode() {
     return this.settings.mode === MODES.COMPUTER;
   }
 
   isComputerTurn() {
     return (
-      this.isComputerMode && !isGameOver(this.state) && this.state.currentPlayer === COMPUTER_PLAYER
+      this.isComputerMode() &&
+      !isGameOver(this.state) &&
+      this.state.currentPlayer === COMPUTER_PLAYER
     );
   }
 
@@ -123,7 +125,7 @@ class TicTacToeApp {
   }
 
   isComputerWin() {
-    return this.isComputerMode && this.state.winner === COMPUTER_PLAYER;
+    return this.isComputerMode() && this.state.winner === COMPUTER_PLAYER;
   }
 
   updateScore(score) {
@@ -136,8 +138,8 @@ class TicTacToeApp {
     for (const [key, element] of Object.entries(this.scoreElements)) {
       element.textContent = String(this.score[key]);
     }
-    this.scoreLabels.O.textContent = this.isComputerMode ? 'Du (O)' : 'Spieler O';
-    this.scoreLabels.X.textContent = this.isComputerMode ? 'Computer (X)' : 'Spieler X';
+    this.scoreLabels.O.textContent = this.isComputerMode() ? 'Du (O)' : 'Spieler O';
+    this.scoreLabels.X.textContent = this.isComputerMode() ? 'Computer (X)' : 'Spieler X';
   }
 
   render() {
@@ -158,11 +160,11 @@ class TicTacToeApp {
   statusText() {
     const { winner, isDraw, currentPlayer } = this.state;
     if (this.isComputerWin()) return 'Der Computer hat gewonnen.\nVersuch es noch einmal!';
-    if (winner && this.isComputerMode) return 'Glückwunsch!\nDu hast gewonnen!';
+    if (winner && this.isComputerMode()) return 'Glückwunsch!\nDu hast gewonnen!';
     if (winner) return `Glückwunsch! Spieler ${winner}\nhat gewonnen!`;
     if (isDraw) return 'Unentschieden!\nNiemand hat gewonnen.';
     if (this.isComputerTurn()) return 'Der Computer denkt nach …';
-    if (this.isComputerMode) return 'Du bist dran';
+    if (this.isComputerMode()) return 'Du bist dran';
     return `Spieler ${currentPlayer} ist dran`;
   }
 }
