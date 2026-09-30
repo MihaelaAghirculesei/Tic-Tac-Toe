@@ -25,7 +25,10 @@ function throwConfetti() {
 
 function sanitizeSettings(value) {
   const mode = Object.values(MODES).includes(value?.mode) ? value.mode : MODES.TWO_PLAYERS;
-  return { mode };
+  const startingPlayer = Object.values(PLAYERS).includes(value?.startingPlayer)
+    ? value.startingPlayer
+    : PLAYERS.O;
+  return { mode, startingPlayer };
 }
 
 class TicTacToeApp {
@@ -67,6 +70,7 @@ class TicTacToeApp {
     this.settingsForm.addEventListener('submit', (event) => event.preventDefault());
 
     this.settingsForm.elements.mode.value = this.settings.mode;
+    this.settingsForm.elements.startingPlayer.value = this.settings.startingPlayer;
     this.renderScore();
     this.restart();
   }
@@ -82,7 +86,8 @@ class TicTacToeApp {
   }
 
   changeSettings() {
-    this.settings = sanitizeSettings({ mode: this.settingsForm.elements.mode.value });
+    const { mode, startingPlayer } = this.settingsForm.elements;
+    this.settings = sanitizeSettings({ mode: mode.value, startingPlayer: startingPlayer.value });
     saveJSON(SETTINGS_STORAGE_KEY, this.settings);
     this.renderScore();
     this.restart();
@@ -90,7 +95,7 @@ class TicTacToeApp {
 
   restart() {
     clearTimeout(this.computerTimer);
-    this.state = createGame();
+    this.state = createGame(this.settings.startingPlayer);
     this.render();
     this.scheduleComputerMove();
   }
