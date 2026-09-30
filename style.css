@@ -61,6 +61,10 @@ body {
   justify-content: center;
   width: 100%;
   max-width: 480px;
+  /* Room for the absolutely positioned theme toggle on both sides keeps the title centred
+     and stops the button from covering it on very narrow screens. */
+  padding-inline: 48px;
+  text-align: center;
 }
 
 h1 {
