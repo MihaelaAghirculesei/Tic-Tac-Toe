@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { THEMES, THEME_STORAGE_KEY, resolveTheme } from '../js/theme.js';
+import { THEMES, THEME_STORAGE_KEY, resolveTheme, themeToStore } from '../js/theme.js';
 
 describe('resolveTheme', () => {
   it('uses a stored choice over the system setting', () => {
@@ -14,6 +14,18 @@ describe('resolveTheme', () => {
     assert.equal(resolveTheme(null, true), THEMES.LIGHT);
     assert.equal(resolveTheme(null, false), THEMES.DARK);
     assert.equal(resolveTheme('high-contrast', true), THEMES.LIGHT);
+  });
+});
+
+describe('themeToStore', () => {
+  it('stores a choice that differs from the system', () => {
+    assert.equal(themeToStore(THEMES.DARK, true), THEMES.DARK);
+    assert.equal(themeToStore(THEMES.LIGHT, false), THEMES.LIGHT);
+  });
+
+  it('clears the choice when it matches the system again', () => {
+    assert.equal(themeToStore(THEMES.LIGHT, true), null);
+    assert.equal(themeToStore(THEMES.DARK, false), null);
   });
 });
 

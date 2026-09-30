@@ -12,6 +12,14 @@ export function resolveTheme(stored, systemPrefersLight) {
   return systemPrefersLight ? THEMES.LIGHT : THEMES.DARK;
 }
 
+/**
+ * Only a choice that differs from the system is stored. Picking the system's theme again
+ * clears it, so the page goes back to following the system.
+ */
+export function themeToStore(theme, systemPrefersLight) {
+  return theme === resolveTheme(null, systemPrefersLight) ? null : theme;
+}
+
 /** The toggle is a "light mode" switch: pressed means the light theme is active. */
 export function initThemeToggle(button) {
   const root = document.documentElement;
@@ -25,7 +33,8 @@ export function initThemeToggle(button) {
   };
 
   button.addEventListener('click', () => {
-    stored = root.dataset.theme === THEMES.LIGHT ? THEMES.DARK : THEMES.LIGHT;
+    const next = root.dataset.theme === THEMES.LIGHT ? THEMES.DARK : THEMES.LIGHT;
+    stored = themeToStore(next, systemLight.matches);
     saveJSON(THEME_STORAGE_KEY, stored);
     apply();
   });
