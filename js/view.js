@@ -22,6 +22,24 @@ function cellCenter(index) {
   };
 }
 
+const ARROW_STEPS = {
+  ArrowLeft: { row: 0, col: -1 },
+  ArrowRight: { row: 0, col: 1 },
+  ArrowUp: { row: -1, col: 0 },
+  ArrowDown: { row: 1, col: 0 },
+};
+
+/** Index of the cell an arrow key leads to; stays put at the board edge. Null for other keys. */
+export function neighbourIndex(index, key) {
+  const step = ARROW_STEPS[key];
+  if (!step) return null;
+
+  const clamp = (value) => Math.min(Math.max(value, 0), GRID_SIZE - 1);
+  const row = clamp(Math.floor(index / GRID_SIZE) + step.row);
+  const col = clamp((index % GRID_SIZE) + step.col);
+  return row * GRID_SIZE + col;
+}
+
 function createCell(index) {
   const cell = document.createElement('button');
   cell.type = 'button';
@@ -47,19 +65,16 @@ export class BoardView {
 
   /** Arrow keys move the focus across the grid (Tab still works as usual). */
   enableArrowNavigation() {
-    const steps = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -GRID_SIZE, ArrowDown: GRID_SIZE };
-
     this.boardElement.addEventListener('keydown', (event) => {
-      const step = steps[event.key];
+      // Leave modified arrows (e.g. Alt+Left = back) to the browser and assistive tech.
+      if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+
       const cell = event.target.closest('.cell');
-      if (!step || !cell) return;
+      const target = cell ? neighbourIndex(Number(cell.dataset.index), event.key) : null;
+      if (target === null) return;
 
       event.preventDefault();
-      const index = Number(cell.dataset.index);
-      const row = Math.floor(index / GRID_SIZE);
-      const target = index + step;
-      const staysInRow = Math.abs(step) !== 1 || Math.floor(target / GRID_SIZE) === row;
-      if (target >= 0 && target < BOARD_SIZE && staysInRow) this.cells[target].focus();
+      this.cells[target].focus();
     });
   }
 
