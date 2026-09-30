@@ -2,6 +2,7 @@ import { findBestMove } from './ai.js';
 import { PLAYERS, createGame, isGameOver, makeMove } from './game.js';
 import { EMPTY_SCORE, recordResult, sanitizeScore } from './score.js';
 import { loadJSON, saveJSON } from './storage.js';
+import { initThemeToggle } from './theme.js';
 import { BoardView } from './view.js';
 
 const SETTINGS_STORAGE_KEY = 'tic-tac-toe:settings';
@@ -205,4 +206,5 @@ class TicTacToeApp {
   }
 }
 
+initThemeToggle(document.getElementById('theme-toggle'));
 new TicTacToeApp();
