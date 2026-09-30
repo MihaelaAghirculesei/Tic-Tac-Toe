@@ -1,16 +1,15 @@
-import { BOARD_SIZE, isGameOver } from './game.js';
+import { BOARD_SIZE, GRID_SIZE, PLAYERS, isGameOver } from './game.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
-const GRID_SIZE = 3;
 // The winning-line overlay uses a 300x300 viewBox, i.e. 100 units per cell,
 // so it scales with the board instead of relying on pixel measurements.
 const CELL_UNITS = 100;
 
 const MARKS = {
-  O: `<svg class="mark mark--o" viewBox="0 0 70 70" aria-hidden="true">
+  [PLAYERS.O]: `<svg class="mark mark--o" viewBox="0 0 70 70" aria-hidden="true">
         <circle cx="35" cy="35" r="30" pathLength="1" />
       </svg>`,
-  X: `<svg class="mark mark--x" viewBox="0 0 70 70" aria-hidden="true">
+  [PLAYERS.X]: `<svg class="mark mark--x" viewBox="0 0 70 70" aria-hidden="true">
         <line x1="10" y1="10" x2="60" y2="60" pathLength="1" />
         <line x1="60" y1="10" x2="10" y2="60" pathLength="1" />
       </svg>`,
