@@ -53,7 +53,10 @@ class TicTacToeApp {
 
     this.view.render(this.state);
     this.statusElement.textContent = this.statusText();
-    this.statusElement.dataset.player = gameOver ? '' : currentPlayer;
+    // Colour the status by the player it talks about; a draw keeps the neutral colour.
+    const statusPlayer = winner ?? (isDraw ? null : currentPlayer);
+    if (statusPlayer) this.statusElement.dataset.player = statusPlayer;
+    else delete this.statusElement.dataset.player;
     this.statusElement.classList.toggle('is-celebrating', winner !== null);
     this.statusElement.classList.toggle('is-draw', isDraw);
     this.restartButton.hidden = !gameOver;
