@@ -45,6 +45,28 @@ export class BoardView {
     });
   }
 
+  /** Arrow keys move the focus across the grid (Tab still works as usual). */
+  enableArrowNavigation() {
+    const steps = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -GRID_SIZE, ArrowDown: GRID_SIZE };
+
+    this.boardElement.addEventListener('keydown', (event) => {
+      const step = steps[event.key];
+      const cell = event.target.closest('.cell');
+      if (!step || !cell) return;
+
+      event.preventDefault();
+      const index = Number(cell.dataset.index);
+      const row = Math.floor(index / GRID_SIZE);
+      const target = index + step;
+      const staysInRow = Math.abs(step) !== 1 || Math.floor(target / GRID_SIZE) === row;
+      if (target >= 0 && target < BOARD_SIZE && staysInRow) this.cells[target].focus();
+    });
+  }
+
+  focusFirstCell() {
+    this.cells[0].focus();
+  }
+
   render(state) {
     const gameOver = isGameOver(state);
 

@@ -6,9 +6,10 @@
   --winner-color: #ff3333;
   --grid-color: #ffffff;
   --cell-hover-color: #464646;
-  --button-color: #4caf50;
-  --button-hover-color: #45a049;
+  --button-color: #2e7d32;
+  --button-hover-color: #1b5e20;
   --button-text-color: #ffffff;
+  --focus-color: #ffd54f;
 
   --grid-line: 6px;
   --board-size: min(320px, calc(100vw - 40px));
@@ -183,6 +184,31 @@ h1 {
 .restart-button:active {
   transform: scale(0.95);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Accessibility */
+
+:focus-visible {
+  outline: 3px solid var(--focus-color);
+  outline-offset: 2px;
+}
+
+.cell:focus-visible {
+  outline-offset: -6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+
+  .status.is-celebrating {
+    animation: none;
+  }
 }
 
 @media (max-width: 500px) {

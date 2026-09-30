@@ -4,7 +4,12 @@ import { BoardView } from './view.js';
 function throwConfetti() {
   // The confetti script comes from a CDN; the game must keep working without it.
   if (typeof window.confetti !== 'function') return;
-  window.confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+  window.confetti({
+    particleCount: 100,
+    spread: 70,
+    origin: { y: 0.6 },
+    disableForReducedMotion: true,
+  });
 }
 
 class TicTacToeApp {
@@ -17,7 +22,12 @@ class TicTacToeApp {
     );
 
     this.view.onCellSelect((index) => this.play(index));
-    this.restartButton.addEventListener('click', () => this.restart());
+    this.view.enableArrowNavigation();
+    this.restartButton.addEventListener('click', () => {
+      this.restart();
+      // The button hides itself, so hand keyboard focus back to the board.
+      this.view.focusFirstCell();
+    });
 
     this.restart();
   }
