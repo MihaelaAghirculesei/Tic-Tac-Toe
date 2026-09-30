@@ -20,12 +20,12 @@
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Markup | Semantic HTML5 |
+| Layer   | Technology                                           |
+| ------- | ---------------------------------------------------- |
+| Markup  | Semantic HTML5                                       |
 | Styling | CSS3 Custom Properties, Keyframe Animations, Flexbox |
-| Logic | Vanilla ES6+ (OOP, SVG DOM API) |
-| Effects | canvas-confetti (CDN) |
+| Logic   | Vanilla ES6+ (OOP, SVG DOM API)                      |
+| Effects | canvas-confetti (CDN)                                |
 
 ## Quick Start
 
