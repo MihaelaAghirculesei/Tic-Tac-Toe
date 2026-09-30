@@ -23,10 +23,11 @@ class TicTacToeApp {
 
     this.view.onCellSelect((index) => this.play(index));
     this.view.enableArrowNavigation();
-    this.restartButton.addEventListener('click', () => {
+    this.restartButton.addEventListener('click', (event) => {
       this.restart();
       // The button hides itself, so hand keyboard focus back to the board.
-      this.view.focusFirstCell();
+      // detail === 0 means Enter/Space; mouse and touch users keep their scroll position.
+      if (event.detail === 0) this.view.focusFirstCell();
     });
 
     this.restart();
