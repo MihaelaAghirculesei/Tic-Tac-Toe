@@ -1,25 +1,35 @@
 :root {
-  --primary-color: #323232;
-  --accent-color: #00b0ef;
+  --background-color: #323232;
+  --text-color: #00b0ef;
+  --circle-color: #00b0ef;
   --cross-color: rgb(155, 192, 0);
   --winner-color: #ff3333;
+  --grid-color: #ffffff;
+  --cell-hover-color: #464646;
   --button-color: #4caf50;
-  --button-hover: #45a049;
-  --border-color: #ffffff;
+  --button-hover-color: #45a049;
+  --button-text-color: #ffffff;
+
+  --grid-line: 6px;
+  --board-size: min(320px, calc(100vw - 40px));
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: Arial, sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: var(--primary-color);
-  color: var(--accent-color);
-  position: relative;
   margin: 0;
   padding: 20px;
   min-height: 100vh;
-  box-sizing: border-box;
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 h1 {
@@ -27,92 +37,116 @@ h1 {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-#game-container {
-  position: relative;
-  display: inline-block;
+.game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-table {
-  border-collapse: separate;
-  border-spacing: 0;
+/* Board */
+
+.board-wrapper {
+  position: relative;
+  width: var(--board-size);
+  aspect-ratio: 1;
   margin-top: 20px;
-  border: 1px solid var(--border-color);
+}
+
+.board {
+  display: grid;
+  /* minmax(0, 1fr) keeps all tracks equal; plain auto rows would grow with their marks. */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: var(--grid-line);
+  /* Half a grid line on the outside keeps every cell centre at exactly 1/6, 3/6, 5/6
+     of the board, which is what the winning-line viewBox assumes. */
+  padding: calc(var(--grid-line) / 2);
+  width: 100%;
+  height: 100%;
+  background-color: var(--grid-color);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-td {
-  width: 100px;
-  height: 100px;
-  text-align: center;
-  vertical-align: middle;
-  border: 3px solid var(--border-color);
+.cell {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background-color: var(--background-color);
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
-td:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+.cell:hover:not([aria-disabled='true']) {
+  background-color: var(--cell-hover-color);
 }
 
-#winning-line-svg {
+.cell[aria-disabled='true'] {
+  cursor: default;
+}
+
+/* Marks and winning line are drawn by animating the stroke (pathLength = 1). */
+
+.mark {
+  width: 70%;
+  height: 70%;
+  fill: none;
+  stroke-width: 5;
+}
+
+.mark--o {
+  stroke: var(--circle-color);
+}
+
+.mark--x {
+  stroke: var(--cross-color);
+}
+
+.mark > *,
+.winning-line line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw-stroke 125ms ease-out forwards;
+}
+
+.winning-line {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
-  z-index: 100;
 }
 
-@keyframes appear {
-  from {
-    opacity: 0;
-  }
+.winning-line line {
+  stroke: var(--winner-color);
+  stroke-width: 5;
+  stroke-linecap: round;
+  animation-duration: 0.5s;
+}
+
+@keyframes draw-stroke {
   to {
-    opacity: 1;
+    stroke-dashoffset: 0;
   }
 }
 
-#winner-text {
+/* Status */
+
+.status {
+  min-height: 2.5em;
+  margin: 20px 0 0;
   font-size: 24px;
-  margin-top: 20px;
-  color: var(--accent-color);
-  text-align: center;
   font-weight: bold;
+  text-align: center;
+  white-space: pre-line;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
 }
 
-.winner-animation {
-  animation: winnerRotate 2.5s linear;
+.status.is-celebrating {
+  animation: winner-rotate 2.5s linear;
 }
 
-#button-container {
-  text-align: center;
-  margin-top: 20px;
-}
-
-#restart-button {
-  background-color: var(--button-color);
-  border: none;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-  border-radius: 12px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-#restart-button:hover {
-  background-color: var(--button-hover);
-  transform: scale(1.05);
-}
-
-#restart-button:active {
-  transform: scale(0.95);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-@keyframes winnerRotate {
+@keyframes winner-rotate {
   0% {
     transform: rotate(0deg) scale(1);
   }
@@ -124,17 +158,39 @@ td:hover {
   }
 }
 
+/* Restart button */
+
+.restart-button {
+  margin-top: 20px;
+  padding: 15px 32px;
+  border: none;
+  border-radius: 12px;
+  background-color: var(--button-color);
+  color: var(--button-text-color);
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.restart-button:hover {
+  background-color: var(--button-hover-color);
+  transform: scale(1.05);
+}
+
+.restart-button:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 @media (max-width: 500px) {
-  td {
-    width: 80px;
-    height: 80px;
-  }
-  
   h1 {
     font-size: 24px;
   }
-  
-  #winner-text {
+
+  .status {
     font-size: 20px;
   }
 }
