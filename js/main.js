@@ -38,6 +38,8 @@ class TicTacToeApp {
     this.statusElement = document.getElementById('status');
     this.restartButton = document.getElementById('restart-button');
     this.settingsForm = document.getElementById('settings');
+    this.settingsNote = document.getElementById('settings-note');
+    this.pendingSettings = null;
     this.scoreElements = {
       O: document.getElementById('score-o'),
       X: document.getElementById('score-x'),
@@ -94,17 +96,37 @@ class TicTacToeApp {
     );
   }
 
+  isGameInProgress() {
+    return !isGameOver(this.state) && this.state.board.some((cell) => cell !== null);
+  }
+
   changeSettings() {
     const { mode, startingPlayer } = this.settingsForm.elements;
-    this.settings = sanitizeSettings({ mode: mode.value, startingPlayer: startingPlayer.value });
-    saveJSON(SETTINGS_STORAGE_KEY, this.settings);
+    const settings = sanitizeSettings({ mode: mode.value, startingPlayer: startingPlayer.value });
+    saveJSON(SETTINGS_STORAGE_KEY, settings);
+
+    // Switching mid-game would silently discard the game (and let a player dodge a loss),
+    // so a game in progress is finished with the settings it started with.
+    if (this.isGameInProgress()) {
+      this.pendingSettings = settings;
+      this.settingsNote.hidden = false;
+      return;
+    }
+    this.applySettings(settings);
+    this.restart();
+  }
+
+  applySettings(settings) {
+    this.settings = settings;
+    this.pendingSettings = null;
+    this.settingsNote.hidden = true;
     this.score = this.loadScore();
     this.renderScore();
-    this.restart();
   }
 
   restart() {
     clearTimeout(this.computerTimer);
+    if (this.pendingSettings) this.applySettings(this.pendingSettings);
     this.state = createGame(this.settings.startingPlayer);
     this.render();
     this.scheduleComputerMove();
