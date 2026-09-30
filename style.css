@@ -194,6 +194,9 @@ h1 {
 /* Restart button */
 
 .restart-button {
+  /* Stay above the rotating winner text, which would otherwise swallow clicks. */
+  position: relative;
+  z-index: 1;
   margin-top: 20px;
   padding: 15px 32px;
   border: none;
