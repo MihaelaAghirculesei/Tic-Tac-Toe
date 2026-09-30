@@ -242,7 +242,9 @@ h1 {
     transition-duration: 1ms !important;
   }
 
-  .status.is-celebrating {
+  /* Decorative motion is dropped entirely rather than flashed for 1ms. */
+  .status.is-celebrating,
+  .status.is-draw {
     animation: none;
   }
 }
