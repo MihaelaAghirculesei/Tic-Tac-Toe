@@ -2,6 +2,8 @@
 
 > A sleek, animated Tic Tac Toe built with vanilla HTML, CSS and JavaScript — no framework, no build step.
 
+[![CI](https://github.com/MihaelaAghirculesei/Tic-Tac-Toe/actions/workflows/ci.yml/badge.svg)](https://github.com/MihaelaAghirculesei/Tic-Tac-Toe/actions/workflows/ci.yml)
+
 **[▶ Play the live demo](https://mihaelaaghirculesei.github.io/Tic-Tac-Toe/)**
 
 <p align="center">
@@ -14,9 +16,10 @@
 
 ## Features
 
-- **Two players or vs. computer** — the computer uses minimax with alpha-beta pruning and never loses
+- **Two players or vs. computer** — the computer uses minimax with alpha-beta pruning, never loses and varies its play among equally good moves
 - **Choose who starts** — O or X; in computer mode X is the computer
-- **Persistent scoreboard** — wins and draws are kept in `localStorage`
+- **Persistent scoreboard** — wins and draws per mode, kept in `localStorage` and synced across open tabs
+- **Fair settings** — changing the opponent or starting player mid-game applies from the next game
 - **Animated SVG marks** — X and O are drawn onto the board stroke by stroke
 - **Responsive winning line** — drawn in a scalable SVG overlay, so it stays aligned on resize and rotation
 - **Light and dark theme** — follows the system preference, can be toggled and is remembered
@@ -31,6 +34,7 @@
 | Styling | CSS custom properties, CSS Grid, keyframe animations     |
 | Logic   | Vanilla JavaScript ES modules, pure game/AI logic        |
 | Tooling | Node's built-in test runner, ESLint, Prettier (dev only) |
+| CI/CD   | GitHub Actions, Dependabot, GitHub Pages                 |
 | Effects | canvas-confetti 1.9.4 from jsDelivr, pinned with SRI     |
 
 ## Getting Started
@@ -48,11 +52,13 @@ Then open the printed URL (e.g. http://localhost:3000).
 ## Development
 
 ```bash
-npm install          # dev tools only (ESLint, Prettier)
-npm test             # unit tests for game logic, score and computer player
+npm install           # dev tools only (ESLint, Prettier)
+npm test              # unit tests: game rules, computer player, score, keyboard navigation, theme
 npm run lint
-npm run format
+npm run format:check  # what CI runs; `npm run format` fixes it
 ```
+
+Every pull request runs lint, format check and tests on GitHub Actions. Dependabot opens monthly update PRs for npm and the Actions themselves.
 
 ## Project Structure
 
@@ -68,6 +74,7 @@ js/
   theme.js          light/dark toggle
   main.js           app controller wiring everything together
 tests/              node:test unit tests
+.github/            CI workflow and Dependabot configuration
 ```
 
 ## License
