@@ -111,7 +111,6 @@ export class BoardView {
       cell.setAttribute('aria-disabled', String(gameOver || locked || player !== null));
     });
 
-    this.boardElement.classList.toggle('is-over', gameOver);
     this.boardElement.setAttribute('aria-busy', String(locked));
     this.boardElement.classList.toggle('is-draw', state.isDraw);
     this.renderWinningLine(state.winningLine);

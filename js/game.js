@@ -5,7 +5,7 @@ export const PLAYERS = Object.freeze({ O: 'O', X: 'X' });
 export const GRID_SIZE = 3;
 export const BOARD_SIZE = GRID_SIZE * GRID_SIZE;
 
-export const WINNING_LINES = Object.freeze([
+const WINNING_LINES = Object.freeze([
   [0, 1, 2],
   [3, 4, 5],
   [6, 7, 8],
